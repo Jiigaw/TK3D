@@ -1,4 +1,5 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿using StbImageSharp;
+using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 using OpenTK.Graphics;
 using OpenTK.Windowing.Common;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Windowing.Common;
 using OpenTK.Graphics.OpenGL4;
 
 namespace TK3D
@@ -18,8 +18,16 @@ namespace TK3D
         {
             -0.5f, 0.5f, 0f, //top left vertex - 0
             0.5f, 0.5f, 0f, //top right vertex - 1
-            0.5f, -0.5f, 0f //bottom right vertex - 2
+            0.5f, -0.5f, 0f, //bottom right vertex - 2
             -0.5f, -0.5f, 0f //bottom left vertex - 3
+        };
+
+        float[] texCoords =
+        {
+            0f, 1f,
+            1f, 1f,
+            1f, 0f,
+            0f, 0f
         };
 
         uint[] indices =
@@ -34,7 +42,10 @@ namespace TK3D
         int vao;
         int shaderProgram;
         int vbo;
+        int textureVBO;
         int ebo;
+        int textureID;
+
 
         int width, height;
         public Game(int width, int height) : base(GameWindowSettings.Default, NativeWindowSettings.Default)
@@ -56,19 +67,34 @@ namespace TK3D
             base.OnLoad();
 
             vao = GL.GenVertexArray();
+
+            //bind vao
+            GL.BindVertexArray(vao);
+
+            // --Vert vbo--
+
             vbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length*sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
-            //bind vao
-            GL.BindVertexArray(vao);
+            // put vert VBO in slot 0 of VAO
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexArrayAttrib(vao, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+            // --Texture vbo--
+            textureVBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, textureVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, texCoords.Length*sizeof(float), texCoords, BufferUsageHint.StaticDraw);
+
+            // put tex VBO in slot 1 of VAO
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexArrayAttrib(vao, 1);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); //Unbind
             GL.BindVertexArray(0);
 
-            ebo = GL.GenBuffer();
+            ebo = GL.GenBuffer();   
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length*sizeof(uint), indices, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -92,6 +118,25 @@ namespace TK3D
             //del shader
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(fragmentShader);
+
+            // --textures--
+            textureID = GL.GenTexture();
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, textureID);
+
+            //parameters
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+
+            //load
+            StbImage.stbi_set_flip_vertically_on_load(1);
+            ImageResult Texture = ImageResult.FromStream(File.OpenRead("../../../Textures/Tex.PNG"), ColorComponents.RedGreenBlueAlpha);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Texture.Width, Texture.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, Texture.Data);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
         }
         protected override void OnUnload()
         {
@@ -100,6 +145,7 @@ namespace TK3D
             GL.DeleteVertexArray(vao);
             GL.DeleteBuffer(vbo);
             GL.DeleteBuffer(ebo);
+            GL.DeleteTexture(textureID);
             GL.DeleteProgram(shaderProgram);
         }
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -109,6 +155,9 @@ namespace TK3D
 
             //draw trig
             GL.UseProgram(shaderProgram);
+
+            GL.BindTexture(TextureTarget.Texture2D, textureID);
+
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
