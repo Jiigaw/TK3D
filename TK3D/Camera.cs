@@ -3,6 +3,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace TK3D
         private float speed = 8f;
         private float screenwidth;
         private float screenheight;
-        private float sensetivity = 50f;
+        private float sensetivity = 100f;
+        const float ViewHeight = 2;
 
         //Position vars
         public Vector3 position;
@@ -39,7 +41,7 @@ namespace TK3D
             return Matrix4.LookAt(position, position + front, up);
         }
         public Matrix4 getProjectionMatrix() {
-            return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), screenwidth / screenheight, 0.1f, 100.0f);
+            return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), screenwidth / screenheight, 0.1f, 100.0f);
         }
 
         private void UpdateVectors()
@@ -108,6 +110,8 @@ namespace TK3D
         public void Update(KeyboardState input, MouseState mouse, FrameEventArgs e) 
         { 
             InputController(input, mouse, e);
+            Console.Clear();
+            Console.WriteLine(position.Y);
         }
     }
 }
