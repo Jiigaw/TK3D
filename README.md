@@ -5,6 +5,9 @@ TK3D is a poorly made 3D engine made by me using the OpenTK library with OpenGL.
 - [ ] Support for complex 3D models
 - [ ] Lighting and shadows
 
+ [![forthebadge](https://forthebadge.com/images/badges/0-percent-optimized.svg)](https://forthebadge.com)
+ [![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)
+ 
 # Build
 ## Requirements
 .NET version 7.0 or higher.
