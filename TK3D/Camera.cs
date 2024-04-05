@@ -111,7 +111,7 @@ namespace TK3D
         { 
             InputController(input, mouse, e);
             Console.Clear();
-            Console.WriteLine(position.Y);
+            Console.WriteLine(position);
         }
     }
 }

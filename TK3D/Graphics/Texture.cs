@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 
@@ -27,6 +28,7 @@ namespace TK3D.Graphics
             //load
             StbImage.stbi_set_flip_vertically_on_load(1);
             ImageResult Texture = ImageResult.FromStream(File.OpenRead("../../../Textures/" + filepath), ColorComponents.RedGreenBlueAlpha);
+            //ImageResult Texture = ImageResult.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("Tex.png"), ColorComponents.RedGreenBlueAlpha);
 
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Texture.Width, Texture.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, Texture.Data);
             GL.BindTexture(TextureTarget.Texture2D, 0);

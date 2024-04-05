@@ -1,12 +1,6 @@
 ﻿using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
-using OpenTK.Graphics;
 using OpenTK.Windowing.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using TK3D.Graphics;
@@ -15,7 +9,6 @@ namespace TK3D
 {
     internal class Game : GameWindow
     {
-
         List<Vector3> vertices = new List<Vector3>() 
         { 
 
@@ -119,14 +112,15 @@ namespace TK3D
         float yRot = 0f;
         Camera camera;
 
-
         int width, height;
         public Game(int width, int height) : base(GameWindowSettings.Default, NativeWindowSettings.Default)
-        {
+        {    
             CenterWindow(new Vector2i(width, height));
             this.width = width;
             this.height = height;
+
         }
+
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
@@ -164,7 +158,7 @@ namespace TK3D
         }
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 1f);
+            GL.ClearColor(0.2f, 0.4f, 0.7f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             program.Bind();
@@ -197,7 +191,10 @@ namespace TK3D
             model += Matrix4.CreateTranslation(new Vector3(20f, 0f, 0f));
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
+            model += Matrix4.CreateTranslation(new Vector3(-20f, 0f, 0f));
+            GL.UniformMatrix4(modelLocation, true, ref model);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
 
             Context.SwapBuffers();
             base.OnRenderFrame(args);
