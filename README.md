@@ -23,5 +23,8 @@ dotnet build -c Release -r linux-x64
 ```
 dotnet build -c Release -r osx-x64
 ```
+# License
+This app can be redistributed and/or modified under the terms of the GNU General Public License version 3 or later published by the Free Software Foundation.
+
 # Repo Activity
 ![Alt](https://repobeats.axiom.co/api/embed/b36a513b9b170dcdca2e0f1fde26a80e1ee7b517.svg "Repobeats analytics image")
